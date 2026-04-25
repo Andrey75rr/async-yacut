@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}YaCut - загрузка файлов{% endblock %}
+{% block content %}
+<main>
+  <section class="container my-5 px-4">
+    <h1 class="text-center">
+      <a href="{{ url_for('index_view') }}" style="text-decoration: none; color: inherit;">
+        <span style="color:red">Ya</span>Cut
+      </a>
+    </h1>
+    <p class="text-center my-4">
+      Загрузите файлы и получите на них короткие ссылки
+    </p>
+
+    <div class="container">
+      <div class="row my-3">
+        <div class="col-sm"></div>
+        <div class="col-sm">
+
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endfor %}
+          {% endwith %}
+
+          <form method="POST" enctype="multipart/form-data" novalidate>
+            {{ form.hidden_tag() }}
+            <div>
+              {{ form.files(
+                class="form-control form-control-lg py-2 mb-1",
+                multiple=True
+              ) }}
+              {% if form.files.errors %}
+                <p class="text-danger mb-2">
+                  {% for error in form.files.errors %}{{ error }}{% endfor %}
+                </p>
+              {% endif %}
+              {{ form.submit(class="btn btn-primary mt-2") }}
+            </div>
+          </form>
+
+        </div>
+        <div class="col-sm"></div>
+      </div>
+    </div>
+
+    {% if uploaded_files %}
+    <div class="container mt-2">
+      <div class="row">
+        <div class="col">
+          <h5 class="mb-3">Загруженные файлы:</h5>
+          <table class="table table-bordered table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Имя файла</th>
+                <th>Короткая ссылка</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for file in uploaded_files %}
+                <tr>
+                  <td>{{ file.name }}</td>
+                  <td><a href="{{ file.short_url }}" target="_blank">{{ file.short_url }}</a></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </section>
+</main>
+{% endblock %}

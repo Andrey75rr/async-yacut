@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}
+  {% if error_code == 404 %}Страница не найдена{% else %}Ошибка сервера{% endif %}
+{% endblock %}
+{% block content %}
+<main>
+  <section class="container my-5 px-4 text-center">
+    <h1 class="display-1 fw-bold" style="color: red;">{{ error_code }}</h1>
+    {% if error_code == 404 %}
+      <h2>Страница не найдена</h2>
+      <p class="text-muted">Запрашиваемая страница не существует.</p>
+    {% else %}
+      <h2>Внутренняя ошибка сервера</h2>
+      <p class="text-muted">Что-то пошло не так. Попробуйте позже.</p>
+    {% endif %}
+    <a href="{{ url_for('index_view') }}" class="btn btn-primary mt-3">
+      На главную
+    </a>
+  </section>
+</main>
+{% endblock %}
