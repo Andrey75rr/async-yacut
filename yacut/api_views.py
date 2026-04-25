@@ -1,4 +1,5 @@
 import re
+from http import HTTPStatus
 
 from flask import Blueprint, jsonify, request, url_for
 
@@ -10,6 +11,7 @@ from .utils import generate_unique_short_id, is_short_id_taken
 api_bp = Blueprint('api', __name__)
 
 SHORT_ID_PATTERN = re.compile(r'^[a-zA-Z0-9]+$')
+MAX_SHORT_ID_LENGTH = 16
 
 
 @api_bp.route('/id/', methods=['POST'])
@@ -27,7 +29,7 @@ def create_short_link():
     custom_id = data.get('custom_id')
 
     if custom_id:
-        if len(custom_id) > 16:
+        if len(custom_id) > MAX_SHORT_ID_LENGTH:
             raise InvalidAPIUsage(
                 'Указано недопустимое имя для короткой ссылки'
             )
@@ -52,7 +54,7 @@ def create_short_link():
         'short_link': url_for(
             'redirect_to_url', short_id=short_id, _external=True
         )
-    }), 201
+    }), HTTPStatus.CREATED
 
 
 @api_bp.route('/id/<string:short_id>/', methods=['GET'])
@@ -61,6 +63,8 @@ def get_original_link(short_id):
     url_map = URLMap.query.filter_by(short=short_id).first()
 
     if not url_map:
-        raise InvalidAPIUsage('Указанный id не найден', status_code=404)
+        raise InvalidAPIUsage(
+            'Указанный id не найден', status_code=HTTPStatus.NOT_FOUND
+        )
 
-    return jsonify({'url': url_map.original}), 200
+    return jsonify({'url': url_map.original}), HTTPStatus.OK
